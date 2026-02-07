@@ -1,3 +1,4 @@
+import fs from 'fs';
 import Websocket from 'ws';
 import jsonfile from 'jsonfile';
 import fetch, { Response } from 'node-fetch';
@@ -41,6 +42,9 @@ export const createChannel = async (name: string, pos: number, newId: string, pa
 }).then((res) => res.json());
 
 export const listen = async (): Promise<void> => {
+  if (!fs.existsSync('./map.json')) {
+    throw new Error('map.json not found. Please run createServer first to generate the channel mapping.');
+  }
   const serverMap = jsonfile.readFileSync('./map.json');
   const socket = new Websocket('wss://gateway.discord.gg/?v=6&encoding=json');
   let authenticated = false;
@@ -119,8 +123,7 @@ export const getChannels = async (): Promise<Channel[]> => fetch(`https://discor
 
 export const createServer = async (channels: Channel[]): Promise<void> => {
   if (!Array.isArray(channels) || channels.length === 0) {
-    console.error('No channels to mirror. Received:', channels);
-    return;
+    throw new Error('No channels to mirror. The channel list is empty (possibly due to an authentication error).');
   }
   console.log('Creating mirror server...');
   const cleanedChannels = channels.map(({

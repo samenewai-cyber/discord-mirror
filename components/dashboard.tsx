@@ -4,14 +4,6 @@ import useSWR from "swr";
 import { StatusCard } from "./status-card";
 import { ChannelList } from "./channel-list";
 
-function RefreshIcon({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" />
-    </svg>
-  );
-}
-
 interface StatusData {
   envVars: { token: boolean; serverId: boolean };
   bot: {
@@ -37,6 +29,24 @@ interface StatusData {
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
+function RefreshIcon({ spinning }: { spinning: boolean }) {
+  return (
+    <svg
+      className={`h-4 w-4 mr-2 ${spinning ? "animate-spin" : ""}`}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+      />
+    </svg>
+  );
+}
+
 export function Dashboard() {
   const { data, error, isLoading, mutate } = useSWR<StatusData>(
     "/api/status",
@@ -45,25 +55,23 @@ export function Dashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-neutral-950">
       <div className="max-w-2xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-xl font-semibold text-foreground tracking-tight">
+            <h1 className="text-xl font-semibold text-neutral-100 tracking-tight">
               Discord Mirror
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-neutral-400 mt-1">
               Bot status and connection diagnostics
             </p>
           </div>
           <button
-            className="inline-flex items-center rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent transition-colors disabled:opacity-50"
             onClick={() => mutate()}
             disabled={isLoading}
+            className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md border border-neutral-700 bg-neutral-900 text-neutral-200 hover:bg-neutral-800 transition-colors disabled:opacity-50"
           >
-            <RefreshIcon
-              className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
-            />
+            <RefreshIcon spinning={isLoading} />
             Refresh
           </button>
         </div>
@@ -77,7 +85,6 @@ export function Dashboard() {
         )}
 
         <div className="space-y-4">
-          {/* Environment Variables */}
           <StatusCard
             title="Environment Variables"
             status={
@@ -96,7 +103,7 @@ export function Dashboard() {
                   }`}
                 />
                 <span>
-                  DISCORD_TOKEN{" "}
+                  {"DISCORD_TOKEN "}
                   {data?.envVars.token ? (
                     <span className="text-emerald-400">configured</span>
                   ) : (
@@ -111,7 +118,7 @@ export function Dashboard() {
                   }`}
                 />
                 <span>
-                  SERVER_ID{" "}
+                  {"SERVER_ID "}
                   {data?.envVars.serverId ? (
                     <span className="text-emerald-400">configured</span>
                   ) : (
@@ -122,7 +129,6 @@ export function Dashboard() {
             </div>
           </StatusCard>
 
-          {/* Bot Identity */}
           <StatusCard
             title="Bot Identity"
             status={
@@ -140,13 +146,13 @@ export function Dashboard() {
             )}
             {data?.bot?.connected && (
               <div className="space-y-1">
-                <p className="text-foreground font-medium">
+                <p className="text-neutral-100 font-medium">
                   {data.bot.username}
                   {data.bot.discriminator !== "0" &&
                     `#${data.bot.discriminator}`}
                 </p>
-                <p className="text-xs font-mono text-muted-foreground">
-                  ID: {data.bot.id}
+                <p className="text-xs font-mono text-neutral-500">
+                  {"ID: "}{data.bot.id}
                 </p>
               </div>
             )}
@@ -155,7 +161,6 @@ export function Dashboard() {
             )}
           </StatusCard>
 
-          {/* Guild Access */}
           <StatusCard
             title="Guild Access"
             status={
@@ -173,12 +178,12 @@ export function Dashboard() {
             )}
             {data?.guild?.connected && (
               <div className="space-y-1">
-                <p className="text-foreground font-medium">
+                <p className="text-neutral-100 font-medium">
                   {data.guild.name}
                 </p>
                 {data.guild.memberCount && (
-                  <p className="text-xs text-muted-foreground">
-                    ~{data.guild.memberCount.toLocaleString()} members
+                  <p className="text-xs text-neutral-500">
+                    {"~"}{data.guild.memberCount.toLocaleString()}{" members"}
                   </p>
                 )}
               </div>
@@ -188,7 +193,6 @@ export function Dashboard() {
             )}
           </StatusCard>
 
-          {/* Channels */}
           <StatusCard
             title="Channels"
             status={
@@ -207,11 +211,11 @@ export function Dashboard() {
             {data?.channels?.fetched && (
               <div className="space-y-3">
                 <p>
-                  Found{" "}
-                  <span className="text-foreground font-medium">
+                  {"Found "}
+                  <span className="text-neutral-100 font-medium">
                     {data.channels.count}
-                  </span>{" "}
-                  channels
+                  </span>
+                  {" channels"}
                 </p>
                 {data.channels.list && data.channels.list.length > 0 && (
                   <ChannelList channels={data.channels.list} />
@@ -224,7 +228,7 @@ export function Dashboard() {
           </StatusCard>
         </div>
 
-        <p className="text-xs text-muted-foreground text-center mt-8">
+        <p className="text-xs text-neutral-600 text-center mt-8">
           discord-mirror status dashboard
         </p>
       </div>

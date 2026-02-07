@@ -1,10 +1,16 @@
 "use client";
 
 import useSWR from "swr";
-import { RefreshCw } from "lucide-react";
 import { StatusCard } from "./status-card";
 import { ChannelList } from "./channel-list";
-import { Button } from "@/components/ui/button";
+
+function RefreshIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" />
+    </svg>
+  );
+}
 
 interface StatusData {
   envVars: { token: boolean; serverId: boolean };
@@ -50,17 +56,16 @@ export function Dashboard() {
               Bot status and connection diagnostics
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
+          <button
+            className="inline-flex items-center rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent transition-colors disabled:opacity-50"
             onClick={() => mutate()}
             disabled={isLoading}
           >
-            <RefreshCw
+            <RefreshIcon
               className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
             />
             Refresh
-          </Button>
+          </button>
         </div>
 
         {error && (

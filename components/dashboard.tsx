@@ -189,7 +189,31 @@ export function Dashboard() {
               </div>
             )}
             {data?.guild && !data.guild.connected && (
-              <p className="text-red-400">{data.guild.error}</p>
+              <div className="space-y-2">
+                <p className="text-red-400">{data.guild.error}</p>
+                {data.guild.error?.includes("Unknown Guild") && (
+                  <div className="rounded-md bg-neutral-800/50 p-3 text-xs text-neutral-400 space-y-2">
+                    <p className="font-medium text-neutral-300">How to fix:</p>
+                    <ol className="list-decimal list-inside space-y-1">
+                      <li>{"Verify your SERVER_ID is correct (right-click the server in Discord > Copy Server ID)"}</li>
+                      <li>{"Make sure the bot has been invited to the server"}</li>
+                      <li>
+                        {"Invite the bot using this URL (replace CLIENT_ID with your bot's application ID):"}
+                      </li>
+                    </ol>
+                    <code className="block bg-neutral-900 rounded p-2 text-[11px] text-neutral-300 break-all">
+                      {"https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=66560&scope=bot"}
+                    </code>
+                    <p>{"The permissions=66560 grants View Channels + Read Message History."}</p>
+                  </div>
+                )}
+                {data.guild.error?.includes("Missing Access") && (
+                  <div className="rounded-md bg-neutral-800/50 p-3 text-xs text-neutral-400 space-y-2">
+                    <p className="font-medium text-neutral-300">How to fix:</p>
+                    <p>{"The bot is in the server but lacks permissions. Re-invite with proper permissions or update the bot's role in Server Settings > Roles."}</p>
+                  </div>
+                )}
+              </div>
             )}
           </StatusCard>
 
@@ -223,7 +247,15 @@ export function Dashboard() {
               </div>
             )}
             {data?.channels && !data.channels.fetched && (
-              <p className="text-red-400">{data.channels.error}</p>
+              <div className="space-y-2">
+                <p className="text-red-400">{data.channels.error}</p>
+                {data.channels.error?.includes("Missing Access") && (
+                  <div className="rounded-md bg-neutral-800/50 p-3 text-xs text-neutral-400 space-y-2">
+                    <p className="font-medium text-neutral-300">How to fix:</p>
+                    <p>{"The bot needs the 'View Channels' permission. Either re-invite with the correct permissions or grant the bot's role access in Server Settings > Roles."}</p>
+                  </div>
+                )}
+              </div>
             )}
           </StatusCard>
         </div>

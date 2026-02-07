@@ -1,17 +1,24 @@
 import fs from 'fs';
-import { listen, createServer, getChannels } from './modules/discord';
+import { discordToken, serverId } from './util/env';
 
-if (fs.existsSync('./map.json')) {
-  listen().catch((err) => {
-    console.error('Error starting listener:', err.message);
-    process.exit(1);
-  });
+// Validate environment before starting
+if (!discordToken || !serverId) {
+  console.warn('Discord Mirror: Missing DISCORD_TOKEN or SERVER_ID. Bot will not start.');
+  console.warn('Set these environment variables and restart to run the bot.');
 } else {
-  getChannels()
-    .then((channels) => createServer(channels))
-    .then(() => listen())
-    .catch((err) => {
-      console.error('Error during setup:', err.message);
-      process.exit(1);
-    });
+  // Dynamic import to avoid crashing when env vars are missing
+  import('./modules/discord').then(({ listen, createServer, getChannels }) => {
+    if (fs.existsSync('./map.json')) {
+      listen().catch((err: Error) => {
+        console.error('Error starting listener:', err.message);
+      });
+    } else {
+      getChannels()
+        .then((channels) => createServer(channels))
+        .then(() => listen())
+        .catch((err: Error) => {
+          console.error('Error during setup:', err.message);
+        });
+    }
+  });
 }

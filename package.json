@@ -19,7 +19,7 @@
     "dotenv": "^8.2.0",
     "jsonfile": "^6.1.0",
     "node-fetch": "^2.6.1",
-    "ts-node": "^9.1.0",
+    "ts-node": "^10.9.0",
     "ws": "^7.4.1"
   },
   "scripts": {

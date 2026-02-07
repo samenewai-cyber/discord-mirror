@@ -109,9 +109,19 @@ export const getChannels = async (): Promise<Channel[]> => fetch(`https://discor
   method: 'GET',
   headers,
 }).then((res) => res.json())
-  .then((json: Channel[]) => json);
+  .then((json) => {
+    if (!Array.isArray(json)) {
+      console.error('Failed to fetch channels:', json);
+      return [];
+    }
+    return json as Channel[];
+  });
 
 export const createServer = async (channels: Channel[]): Promise<void> => {
+  if (!Array.isArray(channels) || channels.length === 0) {
+    console.error('No channels to mirror. Received:', channels);
+    return;
+  }
   console.log('Creating mirror server...');
   const cleanedChannels = channels.map(({
     id, parent_id, guild_id, last_message_id, ...rest
@@ -139,7 +149,12 @@ export const createServer = async (channels: Channel[]): Promise<void> => {
     },
   });
 
-  const serverChannels: Channel[] = await channelResp.json();
+  const serverChannelsJson = await channelResp.json();
+  if (!Array.isArray(serverChannelsJson)) {
+    console.error('Failed to fetch new server channels:', serverChannelsJson);
+    return;
+  }
+  const serverChannels: Channel[] = serverChannelsJson;
 
   return new Promise(async (resolve) => {
     for (const channel of channels) {

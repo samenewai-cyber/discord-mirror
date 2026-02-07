@@ -6,7 +6,7 @@ const { DISCORD_TOKEN: discordToken, SERVER_ID: serverId } = process.env;
 
 const headers = {
   'Content-Type': 'application/json',
-  Authorization: discordToken!,
+  Authorization: `Bot ${discordToken}`,
 };
 
 export {
